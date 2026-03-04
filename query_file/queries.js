@@ -7,7 +7,7 @@ export const insertquery=(data)=>{
             [data.id,data.name,data.password],
             (err)=>{
                 if(err){
-                    return reject("error")
+                    return reject("insert error")
                 }
                 return resolve("success")
             }
