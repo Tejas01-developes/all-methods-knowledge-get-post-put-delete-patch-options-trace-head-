@@ -1,8 +1,8 @@
 import { db } from "../dbconnection/dbconnection.js";
 import bcrypt from 'bcrypt';
-import { token } from "../tokens/token.js";
 import jwt from 'jsonwebtoken';
 import { deletequery, findquery, getquery, insertquery, selectquery, updatequery } from "../query_file/queries.js";
+import { accesstoken, refreshtoken } from "../tokens/token.js";
 
 
 export const insertuser=async(req,resp)=>{
@@ -92,33 +92,26 @@ export const login=async(req,resp)=>{
         return resp.status(400).json({success:false,message:"fields are not present"})
     }
 try{
-    db.query(
-        'select name,password from users1 where name=?',
-        [name],
-       async (err,res)=>{
-            if(err){
-                return resp.status(400).json({success:false,message:"db login error"})
-            }
-            if(res.length === 0){
-                return resp.status(400).json({success:false,message:"no user with this name"})
-            }
-            const compare=await bcrypt.compare(password,res[0].password);
+const loginuser=await getquery({name})
+
+            const compare=await bcrypt.compare(password,loginuser);
             if(!compare){
                 return resp.status(400).json({success:false,message:"password is incorrect"})
             }
-            const tokenn=token(name)
-            const decode= jwt.decode(tokenn,{complete:true})
-            resp.cookie("token",tokenn,{
+            const accesstokenn=accesstoken(name)
+            const refreshtokenn=refreshtoken(name)
+            
+            resp.cookie("token",refreshtokenn,{
                 httpOnly:true,
                 sameSite:'Lax',
                 secure:true,
                 path:'/'
 
             })
-            return resp.status(200).json({success:true,message:"login success","token":decode})
+            return resp.status(200).json({success:true,message:"login success","access":accesstokenn})
+        }catch(err){
+            console.log("error",err)
+        return resp.status(400).json({success:false,message:"login error"})
         }
-    )
-}catch(err){
-    console.log("error",err)
-}
+
 }

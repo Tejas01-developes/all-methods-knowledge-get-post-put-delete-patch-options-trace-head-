@@ -35,15 +35,16 @@ export const selectquery=(data)=>{
 
 export const getquery=(data)=>{
     return new Promise((resolve,reject)=>{
+        console.log("name",data.name);
         db.query(
             'select name,password from users1 where name= ? ',
             [data.name],
             (err,res)=>{
                 if(err){
-                    return reject(err)
+                    return reject("db name password fetch error")
                 }
                 if(res.length === 0){
-                    return reject(err)
+                    return reject("no user with this name")
                 }
                 resolve(res[0].password);
             }
