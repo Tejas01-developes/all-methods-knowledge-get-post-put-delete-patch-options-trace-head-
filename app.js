@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import router from './routes/routes.js';
+import './emailqueue/queueprocess.js';
 dotenv.config();
 
 const app=express();

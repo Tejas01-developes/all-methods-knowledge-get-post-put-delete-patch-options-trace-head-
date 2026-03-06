@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { deletequery, findquery, getquery, insertquery, selectquery, updatequery } from "../query_file/queries.js";
 import { accesstoken, refreshtoken } from "../tokens/token.js";
+import { sendemail } from "../email/email.js";
+import { emailqueue } from "../emailqueue/emailqueue.js";
 
 
 export const insertuser=async(req,resp)=>{
@@ -13,7 +15,15 @@ if(!id || !name || !password){
 try{
 const hash=await bcrypt.hash(password,10);
 const insert=await insertquery({id,name,password:hash})
+
+
+await emailqueue.add({
+   to:name,
+   subject:"welcome mail",
+    text:"welcome to our service"
+})
 return resp.status(200).json({success:true,message:"db insert success"})
+
 
 }catch(err){
 console.log("error",err)
