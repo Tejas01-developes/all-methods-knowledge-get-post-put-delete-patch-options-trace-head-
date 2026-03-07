@@ -20,7 +20,7 @@ export const insertquery=(data)=>{
 export const selectquery=(data)=>{
     return new Promise((resolve,reject)=>{
         db.query(
-            'select * from users1 ',
+            'select name from users1 ',
             (err,res)=>{
                 if(err){
                     return reject("error")

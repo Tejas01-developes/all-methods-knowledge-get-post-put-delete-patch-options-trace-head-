@@ -5,7 +5,7 @@ import { deletequery, findquery, getquery, insertquery, selectquery, updatequery
 import { accesstoken, refreshtoken } from "../tokens/token.js";
 import { sendemail } from "../email/email.js";
 import { emailqueue } from "../emailqueue/emailqueue.js";
-
+import cron from 'node-cron';
 
 export const insertuser=async(req,resp)=>{
 const {id,name,password}=req.body;
@@ -37,7 +37,20 @@ return resp.status(400).json({success:false,message:"db insert failed"})
 export const getdata=async(req,resp)=>{
     try{
     const getdata=await selectquery()
+    const names=getdata.map(names=>names.name);
+        cron.schedule("* * * * * *",()=>{
+            names.forEach(email=>{
+                emailqueue.add({
+                    to:email,
+                    subject:"daily email",
+                    text:"this is our daily email"
+                 })
+            })
+            
+        })
+        // console.log(names)
     return resp.status(200).json({success:true,getdata})
+    
 }catch(err){
     console.log("error",err)
     return resp.status(400).json({success:false,message:"db get data failed"})
@@ -125,3 +138,5 @@ const loginuser=await getquery({name})
         }
 
 }
+
+
