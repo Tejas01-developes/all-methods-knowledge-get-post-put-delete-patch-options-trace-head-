@@ -38,7 +38,8 @@ export const getdata=async(req,resp)=>{
     try{
     const getdata=await selectquery()
     const names=getdata.map(names=>names.name);
-        cron.schedule("* * * * * *",()=>{
+
+        cron.schedule("* * * * *",()=>{
             names.forEach(email=>{
                 emailqueue.add({
                     to:email,
